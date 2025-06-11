@@ -21,10 +21,12 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     groups:
-      github-actions:
+      all-github-actions: # A more descriptive name
         patterns:
           - "*"
+
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10

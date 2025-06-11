@@ -8,9 +8,9 @@ Note that our [code of conduct](https://github.com/newrelic/.github/blob/main/CO
 
 ## Feature Requests
 
-Feature requests should be submitted in the [Issue tracker](../../issues), with a description of the expected behavior & use case, where they’ll remain closed until sufficient interest, [e.g. :+1: reactions](https://help.github.com/articles/about-discussions-in-issues-and-pull-requests/), has been [shown by the community](../../issues?q=label%3A%22votes+needed%22+sort%3Areactions-%2B1-desc).
+Feature requests should be submitted in the [Issue tracker](https://github.com/newrelic/newrelic-lambda-python/issues), with a description of the expected behavior & use case, where they’ll remain closed until sufficient interest, [e.g. :+1: reactions](https://help.github.com/articles/about-discussions-in-issues-and-pull-requests/), has been [shown by the community](https://github.com/newrelic/newrelic-lambda-python/issues?q=label%3A%22votes+needed%22+sort%3Areactions-%2B1-desc).
 Before submitting an Issue, please search for similar ones in the
-[closed issues](../../issues?q=is%3Aissue+is%3Aclosed+label%3Aenhancement).
+[closed issues](https://github.com/newrelic/newrelic-lambda-python/issues?q=is%3Aissue+is%3Aclosed+label%3Aenhancement).
 
 ## Pull Requests
 

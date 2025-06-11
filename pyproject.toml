@@ -12,6 +12,56 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ===========================
+# Project Build Configuration
+# ===========================
+
+[project]
+name="newrelic-lambda"
+description = "New Relic Lambda"
+authors = [{name = "New Relic", email = "open-source@newrelic.com"}]
+maintainers = [{name = "New Relic", email = "open-source@newrelic.com"}]
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+dependencies = ["newrelic>=5.12.0.140"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: System :: Monitoring",
+]
+dynamic = ["version"]
+
+[project.urls]
+GitHub = "https://github.com/newrelic/newrelic-lambda-python"
+
+[build-system]
+requires = [
+    "setuptools>=77.0.3",
+    "setuptools_scm>=6,<9",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+platforms = ["any"]
+include-package-data = true
+package-data = { newrelic_lambda = ["src/newrelic_lambda/*.json"] }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools_scm]
+write_to = "src/newrelic_lambda/_version.py"
+git_describe_command = "git describe --dirty --tags --long --match '*.*.*'"
+
 # ==================
 # Ruff Configuration
 # ==================

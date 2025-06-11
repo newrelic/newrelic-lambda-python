@@ -36,6 +36,7 @@ newrelic.core.attribute._TRANSACTION_EVENT_DEFAULT_ATTRIBUTES.update({
     'aws.lambda.eventSource.timestamp',
     'aws.lambda.eventSource.topicArn',
     'aws.lambda.eventSource.type',
+    'request.headers.host'
 })
 
 COLD_START_RECORDED = False
@@ -240,7 +241,6 @@ def get_attributes_for_event_type(event_type, event):
         if attr is not None:
             attr_names_and_values[attr_name] = attr
     return attr_names_and_values
-
 
 def LambdaHandlerWrapper(wrapped, application=None, name=None,
                          group=None):

@@ -1,12 +1,28 @@
+# Copyright 2020 New Relic, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
+from pathlib import Path
 
 import pytest
 
 
 @pytest.fixture(autouse=True, scope="session")
 def initialize_agent():
-    import newrelic_lambda.agent_protocol  # noqa
     import newrelic.agent
+
+    import newrelic_lambda.agent_protocol
 
     settings = newrelic.agent.global_settings()
     settings.developer_mode = True
@@ -19,10 +35,11 @@ def initialize_agent():
 
 @pytest.fixture(scope="session")
 def readable_fifo():
-    if os.path.exists("/tmp/newrelic-telemetry"):
-        os.unlink("/tmp/newrelic-telemetry")
-    os.mkfifo("/tmp/newrelic-telemetry")
+    fifo_path = Path("/tmp/newrelic-telemetry")
+    if fifo_path.exists():
+        fifo_path.unlink()
+    os.mkfifo(fifo_path)
     # This will block if we don't pass these flags
-    fifo = os.open("/tmp/newrelic-telemetry", os.O_RDONLY | os.O_NONBLOCK)
+    fifo = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
     yield fifo
     os.close(fifo)

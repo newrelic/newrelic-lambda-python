@@ -1,13 +1,29 @@
+# Copyright 2020 New Relic, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
-import boto3
 from time import time
+
+import boto3
 
 log_group_name = os.getenv("AWS_LAMBDA_LOG_GROUP_NAME", "")
 log_stream_name = os.getenv("AWS_LAMBDA_LOG_STREAM_NAME", "")
 log_level = os.getenv("NEW_RELIC_LOG_LEVEL", "info").lower()
 
+
 def put_log_to_cloudwatch(payload):
-    logs_client = boto3.client('logs')
+    logs_client = boto3.client("logs")
 
     def ensure_log_stream_exists(log_group_name, log_stream_name):
         try:
@@ -18,15 +34,10 @@ def put_log_to_cloudwatch(payload):
 
     ensure_log_stream_exists(log_group_name, log_stream_name)
 
-    log_event = {
-        'timestamp': int(time() * 1000),
-        'message': payload,
-    }
+    log_event = {"timestamp": int(time() * 1000), "message": payload}
 
-    logs_client.put_log_events(
-        logGroupName=log_group_name,
-        logStreamName=log_stream_name,
-        logEvents=[log_event]
-    )
+    logs_client.put_log_events(logGroupName=log_group_name, logStreamName=log_stream_name, logEvents=[log_event])
     if log_level == "debug":
-        print(f"Log event successfully sent to CloudWatch: {len(payload)} bytes, log group: {log_group_name}, log stream: {log_stream_name}")
+        print(
+            f"Log event successfully sent to CloudWatch: {len(payload)} bytes, log group: {log_group_name}, log stream: {log_stream_name}"
+        )

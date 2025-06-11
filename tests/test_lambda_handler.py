@@ -1,13 +1,29 @@
+# Copyright 2020 New Relic, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from copy import deepcopy
 
 import pytest
+from newrelic.agent import global_settings
+
+from newrelic_lambda import lambda_handler
+
 from .helpers import (
     override_application_settings,
     validate_transaction_event_attributes,
     validate_transaction_trace_attributes,
 )
-from newrelic.agent import global_settings
-from newrelic_lambda import lambda_handler
 
 
 # NOTE: this fixture will force all tests in this file to assume that a cold
@@ -24,16 +40,10 @@ def force_cold_start_status(request):
 
 @lambda_handler.lambda_handler()
 def handler(event, context):
-    return {
-        "statusCode": "200",
-        "body": "{}",
-        "headers": {"Content-Type": "application/json", "Content-Length": 2},
-    }
+    return {"statusCode": "200", "body": "{}", "headers": {"Content-Type": "application/json", "Content-Length": 2}}
 
 
-_override_settings = {
-    "attributes.include": ["request.parameters.*", "request.headers.*"]
-}
+_override_settings = {"attributes.include": ["request.parameters.*", "request.headers.*"]}
 _expected_attributes = {
     "agent": [
         "request.method",
@@ -70,7 +80,7 @@ firehose_event = {
 }
 
 
-class Context(object):
+class Context:
     aws_request_id = "cookies"
     invoked_function_arn = "arn"
     function_name = "cats"
@@ -92,15 +102,9 @@ def test_lambda_transaction_attributes(is_cold, monkeypatch):
 
     # otherwise, then we need to make sure that we don't see it at all
     else:
-        _forgone_params = {
-            "agent": ["aws.lambda.coldStart"],
-            "user": [],
-            "intrinsic": [],
-        }
+        _forgone_params = {"agent": ["aws.lambda.coldStart"], "user": [], "intrinsic": []}
 
-    @validate_transaction_trace_attributes(
-        required_params=_expected, forgone_params=_forgone_params
-    )
+    @validate_transaction_trace_attributes(required_params=_expected, forgone_params=_forgone_params)
     @validate_transaction_event_attributes(
         required_params=_expected, forgone_params=_forgone_params, exact_attrs=_exact
     )
@@ -205,45 +209,24 @@ _no_status_code_response = {
 def test_lambda_no_status_code_response():
     @lambda_handler.lambda_handler()
     def handler(event, context):
-        return {
-            "body": "{}",
-            "headers": {"Content-Type": "application/json", "Content-Length": 2},
-        }
+        return {"body": "{}", "headers": {"Content-Type": "application/json", "Content-Length": 2}}
 
     handler({"httpMethod": "GET", "path": "/", "headers": {}}, Context)
 
 
-@pytest.mark.parametrize(
-    "event,arn", ((empty_event, None), (firehose_event, "arn:aws:kinesis:EXAMPLE"))
-)
+@pytest.mark.parametrize("event,arn", ((empty_event, None), (firehose_event, "arn:aws:kinesis:EXAMPLE")))
 def test_lambda_event_source_arn_attribute(event, arn):
     if arn is None:
         _exact = None
         _expected = None
-        _forgone = {
-            "user": [],
-            "intrinsic": [],
-            "agent": ["aws.lambda.eventSource.arn"],
-        }
+        _forgone = {"user": [], "intrinsic": [], "agent": ["aws.lambda.eventSource.arn"]}
     else:
-        _exact = {
-            "user": {},
-            "intrinsic": {},
-            "agent": {"aws.lambda.eventSource.arn": arn},
-        }
-        _expected = {
-            "user": [],
-            "intrinsic": [],
-            "agent": ["aws.lambda.eventSource.arn"],
-        }
+        _exact = {"user": {}, "intrinsic": {}, "agent": {"aws.lambda.eventSource.arn": arn}}
+        _expected = {"user": [], "intrinsic": [], "agent": ["aws.lambda.eventSource.arn"]}
         _forgone = None
 
-    @validate_transaction_trace_attributes(
-        required_params=_expected, forgone_params=_forgone
-    )
-    @validate_transaction_event_attributes(
-        required_params=_expected, forgone_params=_forgone, exact_attrs=_exact
-    )
+    @validate_transaction_trace_attributes(required_params=_expected, forgone_params=_forgone)
+    @validate_transaction_event_attributes(required_params=_expected, forgone_params=_forgone, exact_attrs=_exact)
     @override_application_settings(_override_settings)
     def _test():
         handler(event, Context)

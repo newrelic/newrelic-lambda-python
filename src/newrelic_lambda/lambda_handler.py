@@ -1,7 +1,22 @@
+# Copyright 2020 New Relic, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import functools
 import json
 import os
 import re
+from pathlib import Path
 
 import newrelic.agent
 import newrelic.core.attribute
@@ -45,11 +60,12 @@ newrelic.core.attribute._TRANSACTION_EVENT_DEFAULT_ATTRIBUTES.update(
 )
 
 COLD_START_RECORDED = False
-MEGABYTE_IN_BYTES = 2 ** 20
+MEGABYTE_IN_BYTES = 2**20
 PATH_SPLIT_REGEX = re.compile(r"[.\[]")
+EVENT_SOURCES_FILE = Path(__file__).parent / "event-sources.json"
 
 # We're using JSON here to maximize cross-agent consistency.
-with open(os.path.join(os.path.dirname(__file__), "event-sources.json")) as f:
+with EVENT_SOURCES_FILE.open() as f:
     EVENT_TYPE_INFO = json.load(f)
 
 
@@ -61,8 +77,8 @@ def path_get(path, obj):
     path = PATH_SPLIT_REGEX.split(path)
 
     pos = obj
-    for segment in path:
-        segment = segment.rstrip("]")
+    for _segment in path:
+        segment = _segment.rstrip("]")
         try:
             if segment.isdigit():
                 segment = int(segment)
@@ -100,14 +116,13 @@ def extract_event_source_arn(event):
 
         if arn:
             return newrelic.core.attribute.truncate(str(arn))
-        return None
     except Exception:
         pass
 
 
 def detect_event_type(event):
     if isinstance(event, dict):
-        for k, type_info in EVENT_TYPE_INFO.items():
+        for type_info in EVENT_TYPE_INFO.values():
             if all(path_match(path, event) for path in type_info["required_keys"]):
                 return type_info
     return None
@@ -123,7 +138,7 @@ def get_attributes_for_event_type(event_type, event):
     return attr_names_and_values
 
 
-def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
+def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):  # noqa: N802
     def set_agent_attr(transaction, key, value):
         # noinspection PyProtectedMember
         transaction._add_agent_attribute(key, value)
@@ -166,18 +181,14 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
             if "headers" in event:
                 headers = event["headers"]
             elif "multiValueHeaders" in event:
-                headers = {
-                    k: ", ".join(v) for k, v in event["multiValueHeaders"].items()
-                }
+                headers = {k: ", ".join(v) for k, v in event["multiValueHeaders"].items()}
             background_task = False
             try:
                 query_string = None
                 if "queryStringParameters" in event:
-                    query_string = urlencode(event["queryStringParameters"], True)
+                    query_string = urlencode(event["queryStringParameters"], doseq=True)
                 elif "multiValueQueryStringParameters" in event:
-                    query_string = urlencode(
-                        event["multiValueQueryStringParameters"], True
-                    )
+                    query_string = urlencode(event["multiValueQueryStringParameters"], doseq=True)
             except Exception:
                 query_string = None
         except Exception:
@@ -186,7 +197,6 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
             headers = None
             query_string = None
             background_task = True
-        
 
         request_id = getattr(context, "aws_request_id", None)
         aws_arn = getattr(context, "invoked_function_arn", None)
@@ -223,14 +233,10 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
             set_agent_attr(transaction, "aws.lambda.eventSource.arn", event_source)
         if event_type:
             event_type_name = event_type["name"]
-            set_agent_attr(
-                transaction, "aws.lambda.eventSource.eventType", event_type_name
-            )
+            set_agent_attr(transaction, "aws.lambda.eventSource.eventType", event_type_name)
 
             # Save event-specific attributes
-            for attr_name, attr in get_attributes_for_event_type(
-                event_type, event
-            ).items():
+            for attr_name, attr in get_attributes_for_event_type(event_type, event).items():
                 set_agent_attr(transaction, attr_name, attr)
 
         # COLD_START_RECORDED is initialized to "False" when the container
@@ -241,9 +247,9 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
         # that the attribute is not created again during future invocations of
         # this container.
 
-        global COLD_START_RECORDED
+        global COLD_START_RECORDED  # noqa: PLW0603
         if COLD_START_RECORDED is False:
-            set_agent_attr(transaction, "aws.lambda.coldStart", True)
+            set_agent_attr(transaction, "aws.lambda.coldStart", value=True)
             COLD_START_RECORDED = True
 
         settings = newrelic.agent.global_settings()
@@ -275,6 +281,4 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
 
 
 def lambda_handler(application=None, name=None, group=None):
-    return functools.partial(
-        LambdaHandlerWrapper, application=application, name=name, group=group
-    )
+    return functools.partial(LambdaHandlerWrapper, application=application, name=name, group=group)

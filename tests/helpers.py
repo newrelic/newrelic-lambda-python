@@ -1,8 +1,20 @@
-from newrelic.agent import (
-    application_settings,
-    function_wrapper,
-    transient_function_wrapper,
-)
+# Copyright 2020 New Relic, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import copy
+
+from newrelic.agent import application_settings, function_wrapper, transient_function_wrapper
 from newrelic.common.encoding_utils import unpack_field
 from newrelic.core.attribute_filter import AttributeFilter
 from newrelic.core.config import apply_config_setting, flatten_settings
@@ -12,27 +24,32 @@ from newrelic.core.database_utils import SQLConnections
 def override_application_settings(overrides):
     @function_wrapper
     def _override_application_settings(wrapped, instance, args, kwargs):
+        # The settings object has references from a number of
+        # different places. We have to create a copy, overlay
+        # the temporary settings and then when done clear the
+        # top level settings object and rebuild it when done.
+        original_settings = application_settings()
+        backup = copy.deepcopy(original_settings.__dict__)
+
         try:
-            original_settings = application_settings()
-            backup = dict(original_settings)
             for name, value in overrides.items():
                 apply_config_setting(original_settings, name, value)
 
-            original_filter = original_settings.attribute_filter
+            # should also update the attribute filter since it is affected
+            # by application settings
+
             flat_settings = flatten_settings(original_settings)
             original_settings.attribute_filter = AttributeFilter(flat_settings)
 
             return wrapped(*args, **kwargs)
         finally:
             original_settings.__dict__.clear()
-            for name, value in backup.items():
-                apply_config_setting(original_settings, name, value)
-            original_settings.attribute_filter = original_filter
+            original_settings.__dict__.update(backup)
 
     return _override_application_settings
 
 
-def check_attributes(parameters, required_params={}, forgone_params={}):
+def check_attributes(parameters, required_params=None, forgone_params=None):
     if required_params:
         for param in required_params["agent"]:
             assert param in parameters["agentAttributes"]
@@ -51,9 +68,7 @@ def check_attributes(parameters, required_params={}, forgone_params={}):
             assert param not in parameters["userAttributes"]
 
 
-def check_event_attributes(
-    event_data, required_params, forgone_params, exact_attrs=None
-):
+def check_event_attributes(event_data, required_params, forgone_params, exact_attrs=None):
     """Check the event attributes from a single (first) event in a
     SampledDataSet. If necessary, clear out previous errors from StatsEngine
     prior to saving error, so that the desired error is the only one present
@@ -87,15 +102,10 @@ def check_event_attributes(
             assert intrinsics[param] == value, ((param, value), intrinsics)
 
 
-def validate_transaction_event_attributes(
-    required_params={}, forgone_params={}, exact_attrs={}, index=-1
-):
-
+def validate_transaction_event_attributes(required_params=None, forgone_params=None, exact_attrs=None, index=-1):
     captured_events = []
 
-    @transient_function_wrapper(
-        "newrelic.core.stats_engine", "StatsEngine.record_transaction"
-    )
+    @transient_function_wrapper("newrelic.core.stats_engine", "StatsEngine.record_transaction")
     def _capture_transaction_events(wrapped, instance, args, kwargs):
         try:
             result = wrapped(*args, **kwargs)
@@ -123,16 +133,16 @@ def validate_transaction_event_attributes(
 
 
 def validate_transaction_trace_attributes(
-    required_params={}, forgone_params={}, should_exist=True, url=None, index=-1
+    required_params=None,
+    forgone_params=None,
+    should_exist=True,  # noqa: FBT002
+    url=None,
+    index=-1,
 ):
-
     trace_data = []
 
-    @transient_function_wrapper(
-        "newrelic.core.stats_engine", "StatsEngine.record_transaction"
-    )
+    @transient_function_wrapper("newrelic.core.stats_engine", "StatsEngine.record_transaction")
     def _validate_transaction_trace_attributes(wrapped, instance, args, kwargs):
-
         result = wrapped(*args, **kwargs)
 
         # Now that transaction has been recorded, generate

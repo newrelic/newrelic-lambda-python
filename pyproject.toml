@@ -220,7 +220,3 @@ filterwarnings = [
   "ignore::DeprecationWarning:newrelic.common.encoding_utils",
 ]
 xfail_strict = true
-
-[tool.coverage.run]
-branch = true
-source = ["newrelic_lambda"]

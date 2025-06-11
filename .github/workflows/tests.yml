@@ -91,7 +91,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -U pip
-          pip install -U wheel setuptools tox coverage
+          pip install -U wheel setuptools tox
 
       - name: Test
         run: tox -vv -f ${{ matrix.python.tox-prefix }} -- --cov-report=xml

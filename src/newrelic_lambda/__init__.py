@@ -14,4 +14,11 @@
 
 import newrelic_lambda.agent_protocol  # noqa: F401
 
+try:
+    from newrelic_lambda._version import __version__, __version_tuple__
+except ImportError:  # pragma: no cover
+    __version__ = "unknown"  # pragma: no cover
+    __version_tuple__ = (0, 0, 0, "unknown")  # pragma: no cover
+
+
 __all__ = ("agent_protocol",)

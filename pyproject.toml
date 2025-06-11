@@ -204,3 +204,23 @@ ignore = [
     "PT007",  # pytest-parametrize-values-wrong-type (style choice)
     "PT011",  # pytest-raises-too-broad (we frequently test for generic errors)
 ]
+
+# =========================
+# Other Tools Configuration
+# =========================
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --strict -v"
+testpaths = ["src", "tests"]
+filterwarnings = [
+  "error",
+  "ignore::DeprecationWarning:newrelic.console",
+  "ignore::DeprecationWarning:newrelic.packages.*",
+  "ignore::DeprecationWarning:newrelic.core.*",
+  "ignore::DeprecationWarning:newrelic.common.encoding_utils",
+]
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = ["newrelic_lambda"]

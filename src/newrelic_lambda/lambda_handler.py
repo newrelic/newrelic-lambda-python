@@ -39,6 +39,7 @@ newrelic.core.attribute._TRANSACTION_EVENT_DEFAULT_ATTRIBUTES.update(
         "aws.lambda.eventSource.topicArn",
         "aws.lambda.eventSource.type",
         "aws.lambda.eventSource.xAmzId2",
+        "aws.lambda.functionVersion",
         "request.headers.host",
     }
 )
@@ -187,6 +188,7 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
 
         request_id = getattr(context, "aws_request_id", None)
         aws_arn = getattr(context, "invoked_function_arn", None)
+        function_version = getattr(context, "function_version", None)
         event_source = extract_event_source_arn(event)
         event_type = detect_event_type(event)
 
@@ -194,6 +196,8 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
             set_agent_attr(transaction, "aws.requestId", request_id)
         if aws_arn:
             set_agent_attr(transaction, "aws.lambda.arn", aws_arn)
+        if function_version:
+            set_agent_attr(transaction, "aws.lambda.functionVersion", function_version)
         if event_source:
             set_agent_attr(transaction, "aws.lambda.eventSource.arn", event_source)
         if event_type:
@@ -222,8 +226,10 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
             COLD_START_RECORDED = True
 
         settings = newrelic.agent.global_settings()
-        if not settings.aws_arn and aws_arn:
-            settings.aws_arn = aws_arn
+        if aws_arn:
+            settings.aws_lambda_metadata["arn"] = aws_arn
+        if function_version:
+            settings.aws_lambda_metadata["function_version"] = function_version
 
         with transaction:
             result = wrapped(*args, **kwargs)

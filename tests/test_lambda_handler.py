@@ -6,6 +6,7 @@ from helpers import (
     validate_transaction_event_attributes,
     validate_transaction_trace_attributes,
 )
+from newrelic.agent import global_settings
 from newrelic_lambda import lambda_handler
 
 
@@ -42,6 +43,7 @@ _expected_attributes = {
         "response.headers.contentLength",
         "aws.requestId",
         "aws.lambda.arn",
+        "aws.lambda.functionVersion",
     ],
     "user": [],
     "intrinsic": [],
@@ -118,6 +120,13 @@ def test_lambda_transaction_attributes(is_cold, monkeypatch):
 
     _test()
 
+    settings = global_settings()
+    assert hasattr(settings, "aws_lambda_metadata")
+    assert "arn" in settings.aws_lambda_metadata
+    assert settings.aws_lambda_metadata["arn"] == Context.invoked_function_arn
+    assert "function_version" in settings.aws_lambda_metadata
+    assert settings.aws_lambda_metadata["function_version"] == Context.function_version
+
 
 @validate_transaction_trace_attributes(_expected_attributes)
 @validate_transaction_event_attributes(_expected_attributes)
@@ -137,7 +146,7 @@ def test_lambda_malformed_api_gateway_payload(monkeypatch):
 
 
 _malformed_request_attributes = {
-    "agent": ["aws.requestId", "aws.lambda.arn"],
+    "agent": ["aws.requestId", "aws.lambda.arn", "aws.lambda.functionVersion"],
     "user": [],
     "intrinsic": [],
 }
@@ -157,6 +166,7 @@ _malformed_response_attributes = {
         "response.status",
         "aws.requestId",
         "aws.lambda.arn",
+        "aws.lambda.functionVersion",
     ],
     "user": [],
     "intrinsic": [],
@@ -182,6 +192,7 @@ _no_status_code_response = {
         "response.headers.contentLength",
         "aws.requestId",
         "aws.lambda.arn",
+        "aws.lambda.functionVersion",
     ],
     "user": [],
     "intrinsic": [],

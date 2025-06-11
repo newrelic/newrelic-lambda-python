@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 import pytest
-from helpers import (
+from .helpers import (
     override_application_settings,
     validate_transaction_event_attributes,
     validate_transaction_trace_attributes,

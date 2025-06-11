@@ -28,7 +28,7 @@ jobs:
     if: success() || failure() # Does not run on cancelled workflows
     runs-on: ubuntu-latest
     needs:
-      - test-py3
+      - tests
     permissions:
       contents: read
 
@@ -59,7 +59,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   # Tests
-  test-py3:
+  tests:
     strategy:
       fail-fast: False
       matrix:

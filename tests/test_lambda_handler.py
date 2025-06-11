@@ -26,12 +26,12 @@ def handler(event, context):
     return {
         "statusCode": "200",
         "body": "{}",
-        "headers": {"Content-Type": "application/json", "Content-Length": 2,},
+        "headers": {"Content-Type": "application/json", "Content-Length": 2},
     }
 
 
 _override_settings = {
-    "attributes.include": ["request.parameters.*", "request.headers.*"],
+    "attributes.include": ["request.parameters.*", "request.headers.*"]
 }
 _expected_attributes = {
     "agent": [
@@ -41,14 +41,14 @@ _expected_attributes = {
         "response.headers.contentType",
         "response.headers.contentLength",
         "aws.requestId",
-        "aws.lambda.arn"
+        "aws.lambda.arn",
     ],
     "user": [],
     "intrinsic": [],
 }
 
 _exact_attrs = {
-    "agent": {"request.parameters.foo": "bar", "request.headers.host": "myhost",},
+    "agent": {"request.parameters.foo": "bar", "request.headers.host": "myhost"},
     "user": {},
     "intrinsic": {},
 }
@@ -109,7 +109,7 @@ def test_lambda_transaction_attributes(is_cold, monkeypatch):
             {
                 "httpMethod": "GET",
                 "path": "/",
-                "headers": {"HOST": "myhost",},
+                "headers": {"HOST": "myhost"},
                 "queryStringParameters": {"foo": "bar"},
                 "multiValueQueryStringParameters": {"foo": ["bar"]},
             },
@@ -137,7 +137,7 @@ def test_lambda_malformed_api_gateway_payload(monkeypatch):
 
 
 _malformed_request_attributes = {
-    "agent": ["aws.requestId", "aws.lambda.arn",],
+    "agent": ["aws.requestId", "aws.lambda.arn"],
     "user": [],
     "intrinsic": [],
 }
@@ -147,11 +147,17 @@ _malformed_request_attributes = {
 @validate_transaction_event_attributes(_malformed_request_attributes)
 @override_application_settings(_override_settings)
 def test_lambda_malformed_request_headers():
-    handler({"httpMethod": "GET", "path": "/", "headers": None,}, Context)
+    handler({"httpMethod": "GET", "path": "/", "headers": None}, Context)
 
 
 _malformed_response_attributes = {
-    "agent": ["request.method", "request.uri", "response.status", "aws.requestId", "aws.lambda.arn"],
+    "agent": [
+        "request.method",
+        "request.uri",
+        "response.status",
+        "aws.requestId",
+        "aws.lambda.arn",
+    ],
     "user": [],
     "intrinsic": [],
 }
@@ -163,13 +169,9 @@ _malformed_response_attributes = {
 def test_lambda_malformed_response_headers():
     @lambda_handler.lambda_handler()
     def handler(event, context):
-        return {
-            "statusCode": 200,
-            "body": "{}",
-            "headers": None,
-        }
+        return {"statusCode": 200, "body": "{}", "headers": None}
 
-    handler({"httpMethod": "GET", "path": "/", "headers": {},}, Context)
+    handler({"httpMethod": "GET", "path": "/", "headers": {}}, Context)
 
 
 _no_status_code_response = {
@@ -179,7 +181,7 @@ _no_status_code_response = {
         "response.headers.contentType",
         "response.headers.contentLength",
         "aws.requestId",
-        "aws.lambda.arn"
+        "aws.lambda.arn",
     ],
     "user": [],
     "intrinsic": [],
@@ -194,10 +196,10 @@ def test_lambda_no_status_code_response():
     def handler(event, context):
         return {
             "body": "{}",
-            "headers": {"Content-Type": "application/json", "Content-Length": 2,},
+            "headers": {"Content-Type": "application/json", "Content-Length": 2},
         }
 
-    handler({"httpMethod": "GET", "path": "/", "headers": {},}, Context)
+    handler({"httpMethod": "GET", "path": "/", "headers": {}}, Context)
 
 
 @pytest.mark.parametrize(

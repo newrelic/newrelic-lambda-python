@@ -10,10 +10,10 @@ setuptools.setup(
     long_description=README,
     long_description_content_type="text/x-rst",
     license="New Relic License",
-    version="0.1.1",
+    version="0.1.2",
     author="New Relic",
     author_email="support@newrelic.com",
-    install_requires=("newrelic==5.6.0.135"),
+    install_requires=("newrelic==5.10.0.138"),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: Other/Proprietary License",
@@ -27,4 +27,5 @@ setuptools.setup(
     python_requires=">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*",
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
+    zip_safe=False,
 )

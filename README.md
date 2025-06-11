@@ -4,11 +4,18 @@
 <img alt="New Relic Open Source community project banner." src="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/Community_Project.png">
 </picture></a>
 
-# New Relic Lambda Python [build badges go here when available]
+# New Relic Lambda Python
 
+[![GitHub release](https://img.shields.io/github/v/release/newrelic/newrelic-lambda-python?sort=semver)](https://github.com/newrelic/newrelic-lambda-python/releases)
+[![image](https://img.shields.io/pypi/v/newrelic-lambda.svg)](https://pypi.python.org/pypi/newrelic-lambda)
+[![image](https://img.shields.io/pypi/pyversions/newrelic-lambda.svg)](https://pypi.python.org/pypi/newrelic-lambda)
+[![Tests](https://github.com/newrelic/newrelic-lambda-python/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/newrelic/newrelic-lambda-python/actions/workflows/tests.yml)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![MegaLinter](https://github.com/newrelic/newrelic-lambda-python/actions/workflows/mega-linter.yml/badge.svg?branch=main)](https://github.com/newrelic/newrelic-lambda-python/actions/workflows/mega-linter.yml)
+[![codecov](https://codecov.io/gh/newrelic/newrelic-lambda-python/branch/main/graph/badge.svg)](https://codecov.io/gh/newrelic/newrelic-lambda-python)
+[![Secured with Trivy](https://img.shields.io/badge/Trivy-secured-green)](https://github.com/aquasecurity/trivy)
 
-This module provides a decorator, `@lambda_handler` that enables New Relic instrumentation
-of an AWS Lambda function.
+This module provides a decorator, `@lambda_handler` that enables New Relic instrumentation of an AWS Lambda function.
 
 New Relic recommends using its
 [Lambda Layer](https://docs.newrelic.com/docs/serverless-function-monitoring/aws-lambda-monitoring/instrument-lambda-function/configure-serverless-aws-monitoring/) for seamless instrumentation. For the manual instrumentation process, check out

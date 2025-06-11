@@ -157,12 +157,22 @@ def LambdaHandlerWrapper(wrapped, application=None, name=None, group=None):
         try:
             request_method = event["httpMethod"]
             request_path = event["path"]
-            headers = event["headers"]
+            headers = None
+            if "headers" in event:
+                headers = event["headers"]
+            elif "multiValueHeaders" in event:
+                headers = {
+                    k: ", ".join(v) for k, v in event["multiValueHeaders"].items()
+                }
             background_task = False
             try:
-                query_string = urlencode(
-                    event.get("multiValueQueryStringParameters"), True
-                )
+                query_string = None
+                if "queryStringParameters" in event:
+                    query_string = urlencode(event["queryStringParameters"], True)
+                elif "multiValueQueryStringParameters" in event:
+                    query_string = urlencode(
+                        event["multiValueQueryStringParameters"], True
+                    )
             except Exception:
                 query_string = None
         except Exception:

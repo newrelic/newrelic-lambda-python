@@ -1,27 +1,78 @@
 <a href="https://opensource.newrelic.com/oss-category/#community-project"><picture><source media="(prefers-color-scheme: dark)" srcset="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/dark/Community_Project.png"><source media="(prefers-color-scheme: light)" srcset="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/Community_Project.png"><img alt="New Relic Open Source community project banner." src="https://github.com/newrelic/opensource-website/raw/main/src/images/categories/Community_Project.png"></picture></a>
 
-# [Name of Project] [build badges go here when available]
+# New Relic Lambda Python [build badges go here when available]
 
->[Brief description - what is the project and value does it provide? How often should users expect to get releases? How is versioning set up? Where does this project want to go?]
 
-## Installation
+This module provides a decorator, `@lambda_handler` that enables New Relic instrumentation
+of an AWS Lambda function.
 
-> [Include a step-by-step procedure on how to get your code installed. Be sure to include any third-party dependencies that need to be installed separately]
-
-## Getting Started
->[Simple steps to start working with the software similar to a "Hello World"]
+New Relic recommends using its [Lambda Layer](https://docs.newrelic.com/docs/serverless-function-monitoring/aws-lambda-monitoring/instrument-lambda-function/configure-serverless-aws-monitoring/) for seamless instrumentation. For the manual instrumentation process, check out this [guide](https://docs.newrelic.com/docs/serverless-function-monitoring/aws-lambda-monitoring/instrument-lambda-function/sdk-based-instrumentation/) or follow the [Usage](#usage) steps below.
 
 ## Usage
->[**Optional** - Include more thorough instructions on how to use the software. This section might not be needed if the Getting Started section is enough. Remove this section if it's not needed.]
 
+To manually apply the lambda_handler decorator to code, see our [full SDK example](https://docs.newrelic.com/docs/serverless-function-monitoring/aws-lambda-monitoring/instrument-lambda-function/sdk-based-instrumentation/) on our docs website, or reference the same quickstart below.
+
+1. Download both the Python agent and Python lambda wrapper packages and place them in the same directory as your function code. To do this, use pip:
+
+    ```bash
+    pip install -t . newrelic newrelic-lambda
+    ```
+
+2. In your Lambda code, import both the Python agent module and the Python lambda wrapper module.
+
+3. Decorate the handler function using the New Relic decorator. The New Relic package must be imported first in your code. Here's an example:
+
+    ```python
+    import newrelic.agent
+    from newrelic_lambda.lambda_handler import lambda_handler
+
+    newrelic.agent.initialize()
+
+    @lambda_handler()
+    def handler(event, context):
+    ...
+    ```
+
+4. **Optional:** You can also add custom events to your Lambda using the record_custom_event API. Here's an example:
+
+    ```python
+    @lambda_handler()
+    def handler(event, context):
+    newrelic.agent.record_custom_event('CustomEvent', {'foo': 'bar'})
+    ...
+    ```
+
+5. Zip your `lambda_function.py`, `newrelic/` and `newrelic_lambda/` folders together using these guidelines:
+
+    * The New Relic files outside the newrelic/ folder don't need to be included.
+    
+    * If your Lambda function file name is, for example, lambda_function.py, name your zip file lambda_function.zip. Do not use a tarball.
+    
+    * Your Lambda and its associated modules must all be in the zip file's root directory. This means that if you zip a folder that contains the files, it won't work.
+
+6. Upload the zipped file to your AWS Lambda account.
+
+7. To enable distributed tracing and configure environmental variables, refer environment variables documentation.
+
+8. Invoke the Lambda at least once. This creates a CloudWatch log group, which must be present for the next step to work.
+
+    The New Relic decorator gathers data about the Lambda execution, generates a JSON message, and logs it to CloudWatch Logs. Next, configure CloudWatch to send those logs to New Relic.
 
 ## Building
 
->[**Optional** - Include this section if users will need to follow specific instructions to build the software from source. Be sure to include any third party build dependencies that need to be installed separately. Remove this section if it's not needed.]
+To build this project for local testing, use pip to create an editable install with the following command.
+
+```bash
+pip install -e .
+```
 
 ## Testing
 
->[**Optional** - Include instructions on how to run tests if we include tests with the codebase. Remove this section if it's not needed.]
+For testing we use `tox` to handle generating virtual environments for each supported python version. If you have multiple Python versions available on your system, you can run the appropriate tests with the following command, using Python 3.12 as an example:
+
+```bash
+tox run -e py312
+```
 
 ## Support
 
@@ -31,7 +82,7 @@ New Relic hosts and moderates an online forum where you can interact with New Re
 
 ## Contribute
 
-We encourage your contributions to improve [project name]! Keep in mind that when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
+We encourage your contributions to improve New Relic Lambda Python! Keep in mind that when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
 
 If you have any questions, or to execute our corporate CLA (which is required if your contribution is on behalf of a company), drop us an email at opensource@newrelic.com.
 
@@ -43,8 +94,7 @@ If you believe you have found a security vulnerability in this project or any of
 
 If you would like to contribute to this project, review [these guidelines](./CONTRIBUTING.md).
 
-To all contributors, we thank you!  Without your contribution, this project would not be what it is today.  We also host a community project page dedicated to [Project Name](<LINK TO https://opensource.newrelic.com/projects/... PAGE>).
+To all contributors, we thank you!  Without your contribution, this project would not be what it is today.  We also host a community project page dedicated to New Relic Lambda Python(<LINK TO https://opensource.newrelic.com/projects/... PAGE>).
 
 ## License
-[Project Name] is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
->[If applicable: The [project name] also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.]
+New Relic Lambda Python is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.

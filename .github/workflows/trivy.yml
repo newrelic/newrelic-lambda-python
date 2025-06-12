@@ -21,13 +21,14 @@ concurrency:
   group: ${{ github.ref || github.run_id }}-${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   # Upload Trivy data
   trivy:
     if: success() || failure() # Does not run on cancelled workflows
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
 
     steps:
       # Git Checkout

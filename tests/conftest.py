@@ -5,8 +5,9 @@ import pytest
 
 @pytest.fixture(autouse=True, scope="session")
 def initialize_agent():
-    import newrelic_lambda.agent_protocol  # noqa
     import newrelic.agent
+
+    import newrelic_lambda.agent_protocol
 
     settings = newrelic.agent.global_settings()
     settings.developer_mode = True

@@ -1,8 +1,6 @@
-from newrelic.agent import (
-    application_settings,
-    function_wrapper,
-    transient_function_wrapper,
-)
+import copy
+
+from newrelic.agent import application_settings, function_wrapper, transient_function_wrapper
 from newrelic.common.encoding_utils import unpack_field
 from newrelic.core.attribute_filter import AttributeFilter
 from newrelic.core.config import apply_config_setting, flatten_settings
@@ -12,22 +10,27 @@ from newrelic.core.database_utils import SQLConnections
 def override_application_settings(overrides):
     @function_wrapper
     def _override_application_settings(wrapped, instance, args, kwargs):
+        # The settings object has references from a number of
+        # different places. We have to create a copy, overlay
+        # the temporary settings and then when done clear the
+        # top level settings object and rebuild it when done.
+        original_settings = application_settings()
+        backup = copy.deepcopy(original_settings.__dict__)
+
         try:
-            original_settings = application_settings()
-            backup = dict(original_settings)
             for name, value in overrides.items():
                 apply_config_setting(original_settings, name, value)
 
-            original_filter = original_settings.attribute_filter
+            # should also update the attribute filter since it is affected
+            # by application settings
+
             flat_settings = flatten_settings(original_settings)
             original_settings.attribute_filter = AttributeFilter(flat_settings)
 
             return wrapped(*args, **kwargs)
         finally:
             original_settings.__dict__.clear()
-            for name, value in backup.items():
-                apply_config_setting(original_settings, name, value)
-            original_settings.attribute_filter = original_filter
+            original_settings.__dict__.update(backup)
 
     return _override_application_settings
 

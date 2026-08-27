@@ -166,6 +166,54 @@
       }
     }
   },
+  "apiGatewayV2": {
+    "expected_type": "apiGatewayV2",
+    "expected_arn": null,
+    "expected_attributes": {
+      "aws.lambda.eventSource.accountId": "123456789012",
+      "aws.lambda.eventSource.apiId": "1234567890",
+      "aws.lambda.eventSource.stage": "prod"
+    },  
+    "event": {
+      "version": "2.0",
+      "routeKey": "POST /users",
+      "rawPath": "/users",
+      "rawQueryString": "userId=123&status=active",
+      "cookies": [
+        "session-id=xyz123"
+      ],
+      "headers": {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "host": "1234567890.execute-api.us-west-2.amazonaws.com",
+        "x-amzn-trace-id": "Root=1-60a45e-12345678"
+      },
+      "queryStringParameters": {
+        "userId": "123",
+        "status": "active"
+      },
+      "requestContext": {
+        "accountId": "123456789012",
+        "apiId": "1234567890",
+        "domainName": "://example.com",
+        "domainPrefix": "api",
+        "http": {
+            "method": "POST",
+            "path": "/users",
+            "protocol": "HTTP/1.1",
+            "sourceIp": "192.0.2.1",
+            "userAgent": "Mozilla/5.0"
+        },
+        "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+        "routeKey": "POST /users",
+        "stage": "prod",
+        "time": "12/Mar/2026:19:03:58 +0000",
+        "timeEpoch": 1773342238000
+      },
+      "body": "{\"name\": \"John Doe\", \"email\": \"john@example.com\"}",
+      "isBase64Encoded": false
+    }
+  },
   "cloudFront": {
     "expected_type": "cloudFront",
     "expected_arn": null,

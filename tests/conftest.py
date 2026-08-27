@@ -20,9 +20,9 @@ import pytest
 
 @pytest.fixture(autouse=True, scope="session")
 def initialize_agent():
-    import newrelic.agent
+    import newrelic.agent   # noqa: PLC0415
 
-    import newrelic_lambda.agent_protocol
+    import newrelic_lambda.agent_protocol   # noqa: PLC0415
 
     settings = newrelic.agent.global_settings()
     settings.developer_mode = True

@@ -24,7 +24,23 @@
             "requestContext.stage"
         ]
     },
-    "cloudFront": {
+    "apiGatewayV2": {
+        "attributes": {
+            "aws.lambda.eventSource.accountId": "requestContext.accountId",
+            "aws.lambda.eventSource.apiId": "requestContext.apiId",
+            "aws.lambda.eventSource.stage": "requestContext.stage"
+        },
+        "name": "apiGatewayV2",
+        "required_keys": [
+            "version",
+            "headers",
+            "requestContext.http",
+            "requestContext.http.path",
+            "requestContext.http.method",
+            "requestContext.stage"
+        ]
+    },
+	"cloudFront": {
         "attributes": {},
         "name": "cloudFront",
         "required_keys": [

@@ -29,9 +29,6 @@ jobs:
   trivy:
     if: success() || failure() # Does not run on cancelled workflows
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      security-events: write
 
     steps:
       # Git Checkout
@@ -43,7 +40,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner in repo mode
         if: ${{ github.event_name == 'pull_request' }}
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # 0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # 0.36.0
         with:
           scan-type: "fs"
           ignore-unfixed: true
@@ -53,7 +50,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner in repo mode
         if: ${{ github.event_name == 'schedule' }}
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # 0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # 0.36.0
         with:
           scan-type: "fs"
           ignore-unfixed: true

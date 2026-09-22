@@ -18,6 +18,6 @@ setuptools.setup(
     name="newrelic-lambda",
     setup_requires=[
         "setuptools>=77.0.3",
-        "setuptools_scm>=6,<10",
+        "setuptools_scm>=6,<11",
     ],
 )

@@ -27,41 +27,41 @@ To manually apply the lambda_handler decorator to code, see our [full SDK exampl
 
 1. Download both the Python agent and Python lambda wrapper packages and place them in the same directory as your function code. To do this, use pip:
 
-    ```bash
-    pip install -t . newrelic newrelic-lambda
-    ```
+   ```bash
+   pip install -t . newrelic newrelic-lambda
+   ```
 
 2. In your Lambda code, import both the Python agent module and the Python lambda wrapper module.
 
 3. Decorate the handler function using the New Relic decorator. The New Relic package must be imported first in your code. Here's an example:
 
-    ```python
-    import newrelic.agent
-    from newrelic_lambda.lambda_handler import lambda_handler
+   ```python
+   import newrelic.agent
+   from newrelic_lambda.lambda_handler import lambda_handler
 
-    newrelic.agent.initialize()
+   newrelic.agent.initialize()
 
-    @lambda_handler()
-    def handler(event, context):
-    ...
-    ```
+   @lambda_handler()
+   def handler(event, context):
+   ...
+   ```
 
 4. **Optional:** You can also add custom events to your Lambda using the record_custom_event API. Here's an example:
 
-    ```python
-    @lambda_handler()
-    def handler(event, context):
-    newrelic.agent.record_custom_event('CustomEvent', {'foo': 'bar'})
-    ...
-    ```
+   ```python
+   @lambda_handler()
+   def handler(event, context):
+   newrelic.agent.record_custom_event('CustomEvent', {'foo': 'bar'})
+   ...
+   ```
 
 5. Zip your `lambda_function.py`, `newrelic/` and `newrelic_lambda/` folders together using these guidelines:
 
-    * The New Relic files outside the newrelic/ folder don't need to be included.
+   - The New Relic files outside the newrelic/ folder don't need to be included.
 
-    * If your Lambda function file name is, for example, lambda_function.py, name your zip file lambda_function.zip. Do not use a tarball.
+   - If your Lambda function file name is, for example, lambda_function.py, name your zip file lambda_function.zip. Do not use a tarball.
 
-    * Your Lambda and its associated modules must all be in the zip file's root directory. This means that if you zip a folder that contains the files, it won't work.
+   - Your Lambda and its associated modules must all be in the zip file's root directory. This means that if you zip a folder that contains the files, it won't work.
 
 6. Upload the zipped file to your AWS Lambda account.
 
@@ -69,7 +69,7 @@ To manually apply the lambda_handler decorator to code, see our [full SDK exampl
 
 8. Invoke the Lambda at least once. This creates a CloudWatch log group, which must be present for the next step to work.
 
-    The New Relic decorator gathers data about the Lambda execution, generates a JSON message, and logs it to CloudWatch Logs. Next, configure CloudWatch to send those logs to New Relic.
+   The New Relic decorator gathers data about the Lambda execution, generates a JSON message, and logs it to CloudWatch Logs. Next, configure CloudWatch to send those logs to New Relic.
 
 ## Building
 
@@ -91,7 +91,7 @@ tox run -e py312
 
 New Relic hosts and moderates an online forum where you can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the New Relic Explorers Hub. You can find this project's topic/threads here:
 
->Add the url for the support thread here: discuss.newrelic.com
+> Add the url for the support thread here: discuss.newrelic.com
 
 ## Contribute
 
@@ -108,4 +108,5 @@ If you believe you have found a security vulnerability in this project or any of
 If you would like to contribute to this project, review [these guidelines](./CONTRIBUTING.md).
 
 ## License
+
 New Relic Lambda Python is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.

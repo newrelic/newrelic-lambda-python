@@ -33,6 +33,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: System :: Monitoring",
 ]
@@ -52,7 +53,7 @@ build-backend = "setuptools.build_meta"
 package-dir = {"" = "src"}
 platforms = ["any"]
 include-package-data = true
-package-data = { newrelic_lambda = ["src/newrelic_lambda/*.json"] }
+package-data = { newrelic_lambda = ["*.json"] }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -69,7 +70,6 @@ git_describe_command = "git describe --dirty --tags --long --match '*.*.*'"
 [tool.ruff]
 output-format = "grouped"
 line-length = 120
-target-version = "py37"
 force-exclude = true  # Fixes issue with megalinter config preventing exclusion of files
 extend-exclude = [
     "setup.py",

@@ -75,6 +75,8 @@ jobs:
             tox-prefix: py312
           - version: "3.13"
             tox-prefix: py313
+          - version: "3.14"
+            tox-prefix: py314
 
     runs-on: ubuntu-latest
     timeout-minutes: 5
